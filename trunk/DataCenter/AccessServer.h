@@ -9,8 +9,10 @@
 #define ACCESSSERVER_H_
 
 #include "cppsocket/tcpserver.h"
+#include <ev++.h>
 
 using namespace CPPSocket;
+using namespace ev;
 
 class AccessServer
 {
@@ -21,8 +23,8 @@ public:
 	void Start(int nPort);
 protected:
 	TCPServer tcp_server;
-	void registerListener(void);
-	void onIncomeConnect(void);
+	io incomeWatcher;
+	void onIncomeConnect(io& watcher,int revent);
 };
 
 #endif /* ACCESSSERVER_H_ */

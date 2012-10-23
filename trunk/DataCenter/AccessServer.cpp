@@ -7,6 +7,9 @@
 
 #include "AccessServer.h"
 #include <ev++.h>
+
+using namespace ev;
+
 AccessServer::AccessServer()
 {
 	// TODO Auto-generated constructor stub
@@ -20,5 +23,11 @@ AccessServer::~AccessServer()
 
 void AccessServer::Start(int nPort)
 {
+
 	tcp_server.start(nPort,10);
+	incomeWatcher.set<AccessServer,&AccessServer::onIncomeConnect>(this);
+}
+
+void AccessServer::onIncomeConnect(io& watcher, int revent)
+{
 }
