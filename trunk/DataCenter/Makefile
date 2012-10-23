@@ -6,7 +6,7 @@ CPPSOCKET_OBJ = $(patsubst %.cpp, %.o, $(CPPSOCKET_SRC))
 
 OBJS =		$(CPPSOCKET_OBJ) DataCenter.o AccessServer.o  
 
-LIBS =
+LIBS =   -lev
 
 TARGET =	DataCenter
 
