@@ -23,9 +23,9 @@ AccessServer::~AccessServer()
 
 void AccessServer::Start(int nPort)
 {
-
 	tcp_server.start(nPort,10);
 	incomeWatcher.set<AccessServer,&AccessServer::onIncomeConnect>(this);
+	incomeWatcher.set((int)tcp_server,ev::READ);
 }
 
 void AccessServer::onIncomeConnect(io& watcher, int revent)
