@@ -58,7 +58,7 @@ namespace CPPSocket
       * @return The pointer to the new connection. Delete when not needed anymore.
       */
     TCPConnection* getConnection(Address& addr) throw (Exception);
-
+    int acceptSocket(Address& addr) { return socket.accept(addr);};
     /** Wait until a new connection arrives or a timeout occurrs.
       *
       * @param seconds Set full second timeout to n seconds.

@@ -4,7 +4,8 @@ CPPSOCKET_SRC = $(wildcard cppsocket/*.cpp)
 
 CPPSOCKET_OBJ = $(patsubst %.cpp, %.o, $(CPPSOCKET_SRC))
 
-OBJS =		$(CPPSOCKET_OBJ) DataCenter.o AccessServer.o  
+
+OBJS =		$(CPPSOCKET_OBJ)   $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 
 LIBS =   -lev
 
