@@ -17,6 +17,7 @@
 #include "ProbeDevice.h"
 #include <ev++.h>
 #include "DeviceTable.h"
+#include <set>
 
 using namespace std;
 using namespace CPPSocket;
@@ -31,8 +32,12 @@ public:
 	virtual ~AccessServer();
 	void Start(int nPort = 0);
 	void Run(void);
+	void Stop();
 	void Process(unsigned int event);
+	static void SetSignalHander(void);
+	static void SignalHandle(sig& water, int revent);
 	static bool bStop;
+
 protected:
 	DeviceTable clients;
 	TCPServer server;
@@ -40,6 +45,14 @@ protected:
     io incomeWatcher;
     void onIncomeConnect(io& watcher,int revent);
 
+    static set<AccessServer*> servers;
+    static sig signal_watcher_int;
+    static sig signal_watcher_term;
+    static void registerServer(AccessServer* ptr)
+    {
+    	if (servers.count(ptr) == 0)
+    		servers.insert(ptr);
+    };
 };
 
 #endif /* ACCESSSERVER_H_ */

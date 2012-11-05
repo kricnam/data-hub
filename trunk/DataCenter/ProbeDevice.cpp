@@ -83,5 +83,6 @@ void ProbeDeviceAgent::SetConnect(int socket)
 
 	TimerWatch.set<ProbeDeviceAgent,&ProbeDeviceAgent::OnTimeOut>(this);
 	TimerWatch.repeat = 30;
+	TimerWatch.again();
 }
 
