@@ -20,6 +20,9 @@ using namespace std;
 using namespace ev;
 
 bool AccessServer::bStop = false;
+set<AccessServer*> AccessServer::servers;
+sig AccessServer::signal_watcher_int;
+sig AccessServer::signal_watcher_term;
 
 AccessServer::AccessServer()
 {
@@ -37,6 +40,7 @@ void AccessServer::Start(int nPort)
 	incomeWatcher.set<AccessServer,&AccessServer::onIncomeConnect>(this);
 	incomeWatcher.set(server.getSocket(),ev::READ);
 	incomeWatcher.start();
+	registerServer(this);
 }
 
 void AccessServer::Run(void)
@@ -46,6 +50,38 @@ void AccessServer::Run(void)
 
 void AccessServer::Process(unsigned int event)
 {
+}
+
+void AccessServer::SetSignalHander(void)
+{
+	    sigset_t block_set;
+	    signal_watcher_int.set(SIGINT);
+	    signal_watcher_int.set<AccessServer::SignalHandle>();
+	    signal_watcher_int.start();
+	    signal_watcher_term.set(SIGTERM);
+	    signal_watcher_term.set<AccessServer::SignalHandle>();
+	    signal_watcher_term.start();
+
+	    /* block PIPE signal */
+	    sigemptyset(&block_set);
+	    sigaddset(&block_set, SIGPIPE);
+	    sigprocmask(SIG_BLOCK, &block_set, NULL);
+}
+
+void AccessServer::SignalHandle(sig& water, int revent)
+{
+	INFO("exit");
+	get_default_loop().break_loop();
+	set<AccessServer*>::iterator it;
+	for(it = servers.begin() ; it != servers.end(); it++)
+		(*it)->Stop();
+
+}
+
+void AccessServer::Stop()
+{
+	TRACE("");
+	server.stop();
 }
 
 void AccessServer::onIncomeConnect(io& watcher, int revent)
