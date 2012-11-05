@@ -11,12 +11,12 @@
 #include "ProcessAgent.h"
 #include <ev++.h>
 #include "cppsocket/tcpconnection.h"
-#include "DeviceTable.h"
 
 using namespace std;
 using namespace ev;
 using namespace CPPSocket;
-class DeviceTable;
+
+class AccessServer;
 class ProbeDeviceAgent
 {
 public:
@@ -32,9 +32,11 @@ public:
 		strIP = szIP;
 		this->nPort = nPort;
 	};
+	void SetServer(AccessServer* ptr) { ptrSrv = ptr;};
 	string strDevID; // A unique Device ID
-	DeviceTable* ptrTable;
+
 protected:
+	AccessServer* ptrSrv;
 	int nSocket;
 	io IOReadWatch;
 	timer TimerWatch;

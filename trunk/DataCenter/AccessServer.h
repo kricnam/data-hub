@@ -24,7 +24,8 @@ using namespace CPPSocket;
 using namespace ev;
 
 #define MAX_EVENTS 10000
-
+class DeviceTable;
+class ProbeDeviceAgent;
 class AccessServer:public virtual  ProcessAgent
 {
 public:
@@ -34,6 +35,7 @@ public:
 	void Run(void);
 	void Stop();
 	void Process(unsigned int event);
+	void OnDisconnect(ProbeDeviceAgent& agent);
 	static void SetSignalHander(void);
 	static void SignalHandle(sig& water, int revent);
 	static bool bStop;
@@ -48,11 +50,8 @@ protected:
     static set<AccessServer*> servers;
     static sig signal_watcher_int;
     static sig signal_watcher_term;
-    static void registerServer(AccessServer* ptr)
-    {
-    	if (servers.count(ptr) == 0)
-    		servers.insert(ptr);
-    };
+    static void registerServer(AccessServer* ptr);
+
 };
 
 #endif /* ACCESSSERVER_H_ */

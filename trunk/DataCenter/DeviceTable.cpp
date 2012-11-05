@@ -7,7 +7,7 @@
 
 #include "DeviceTable.h"
 #include "ProbeDevice.h"
-#include <list>
+#include "TraceLog.h"
 using namespace std;
 
 DeviceTable::DeviceTable()
@@ -18,7 +18,7 @@ DeviceTable::DeviceTable()
 
 DeviceTable::~DeviceTable()
 {
-	// TODO Auto-generated destructor stub
+	// TODO delete all allocated memory
 }
 
 ProbeDeviceAgent& DeviceTable::AllocAgent(void)
@@ -28,44 +28,40 @@ ProbeDeviceAgent& DeviceTable::AllocAgent(void)
 		//allocate instance
 		if ((devicePool.size()+1) >= devicePool.capacity())
 		{
+			TRACE("realloc space");
 			devicePool.reserve(10 + devicePool.capacity());
 		}
-
+		DEBUG("alloc new memory");
 		ProbeDeviceAgent* agent = new ProbeDeviceAgent;
 		refDevice ref;
-		ref.ptrDevice = agent;
+		ref = agent;
 		devicePool.push_back(ref);
 		freeDevice.push_back(ref);
 	}
-	ProbeDeviceAgent& agent = *(freeDevice.front().ptrDevice);
+	ProbeDeviceAgent& agent = *(freeDevice.front());
 	freeDevice.pop_front();
+	workingDevice.insert(&agent);
+	DEBUG("pool %d,free %d,used %d",devicePool.size(),freeDevice.size(),workingDevice.size());
 	return  agent;
 }
 
-ProbeDeviceAgent& DeviceTable::SetWorkingOn(const char* szID,
-		ProbeDeviceAgent& device)
+
+ProbeDeviceAgent& DeviceTable::ReleaseDevice(ProbeDeviceAgent& device)
 {
-	refDevice ref;
-	ref.ptrDevice =  &device;
-	workingDevice[szID] = ref;
+	set<refDevice>::iterator it = workingDevice.find(&device);
+
+	if (it == workingDevice.end()) throw exception();
+	workingDevice.erase(it);
+	freeDevice.push_back(&device);
+	DEBUG("pooi %d,free %d,used %d",devicePool.size(),freeDevice.size(),workingDevice.size());
 	return device;
 }
 
-ProbeDeviceAgent& DeviceTable::ReleaseDevice(const char* szID)
+void DeviceTable::ReleaseAll(void)
 {
-	map<string,refDevice>::iterator it;
-
-	refDevice ref;
-
-	it = workingDevice.find(szID);
-
-	if (it == workingDevice.end()) throw exception();
-
-	ref.ptrDevice = workingDevice[szID].ptrDevice;
-	ProbeDeviceAgent& agent = *ref.ptrDevice;
-	freeDevice.push_back(ref);
-	workingDevice.erase(it);
-	return agent;
+	vector<refDevice>::iterator it;
+	for(it = devicePool.begin();it != devicePool.end() ; it++)
+	{
+		delete (*it);
+	}
 }
-
-

@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "TraceLog.h"
+#include "AccessServer.h"
 
 using namespace ev;
 using namespace CPPSocket;
@@ -21,12 +22,20 @@ ProbeDeviceAgent::ProbeDeviceAgent()
 {
 	nPort = 0;
 	nSocket = -1;
-	ptrTable = NULL;
+	ptrSrv = NULL;
 }
 
 ProbeDeviceAgent::~ProbeDeviceAgent()
 {
-
+	IOReadWatch.stop();
+	DisconnectSignal.stop();
+	TimerWatch.stop();
+	if (nSocket > 0 )
+	{
+		shutdown(nSocket,SHUT_RDWR);
+		close(nSocket);
+	}
+	TRACE("agent vanished");
 }
 
 void ProbeDeviceAgent::OnReadClient(io& watcher, int revent)
@@ -66,8 +75,8 @@ void ProbeDeviceAgent::OnDisconnect(async& watcher, int revent)
 	TimerWatch.stop();
 	close(nSocket);
 	nSocket = -1;
-	if (ptrTable)
-		ptrTable->ReleaseDevice(strDevID.c_str());
+	if (ptrSrv)
+		ptrSrv->OnDisconnect(*this);
 	TRACE("client removed");
 }
 
