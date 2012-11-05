@@ -37,6 +37,7 @@ namespace CPPSocket
 
   void TCPServer::stop() throw (Exception)
   {
+	socket.shutdown(Socket::READ_WRITE);
     socket.close();
   }
 

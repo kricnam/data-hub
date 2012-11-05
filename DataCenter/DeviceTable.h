@@ -9,13 +9,13 @@
 #define DEVICETABLE_H_
 #include "ProbeDevice.h"
 #include <string>
-#include <map>
 #include <list>
+#include <set>
 #include <vector>
-
 
 using namespace std;
 class ProbeDeviceAgent;
+
 class DeviceTable
 {
 public:
@@ -23,17 +23,15 @@ public:
 	virtual ~DeviceTable();
 	ProbeDeviceAgent& AllocAgent(void);
 	ProbeDeviceAgent& SetWorkingOn(const char* szID,ProbeDeviceAgent& device);
-	ProbeDeviceAgent& ReleaseDevice(const char* szID);
+	ProbeDeviceAgent& ReleaseDevice(ProbeDeviceAgent& devic);
+	void ReleaseAll(void);
 
 protected:
-	typedef struct _refDevice
-	{
-		ProbeDeviceAgent* ptrDevice;
-	} refDevice;
+	typedef ProbeDeviceAgent* refDevice;
 
 	vector<refDevice>  devicePool;
 	list<refDevice> freeDevice;
-	map<string,refDevice> workingDevice;
+	set<refDevice> workingDevice;
 };
 
 #endif /* DEVICETABLE_H_ */
