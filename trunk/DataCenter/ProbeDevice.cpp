@@ -65,7 +65,7 @@ void ProbeDeviceAgent::OnReadClient(io& watcher, int revent)
 void ProbeDeviceAgent::OnTimeOut(timer& watcher, int revent)
 {
 	TRACE("timer");
-	TimerWatch.again();
+	//TimerWatch.again();
 }
 
 void ProbeDeviceAgent::OnDisconnect(async& watcher, int revent)
@@ -92,6 +92,6 @@ void ProbeDeviceAgent::SetConnect(int socket)
 
 	TimerWatch.set<ProbeDeviceAgent,&ProbeDeviceAgent::OnTimeOut>(this);
 	TimerWatch.repeat = 30;
-	TimerWatch.again();
+	TimerWatch.start();
 }
 

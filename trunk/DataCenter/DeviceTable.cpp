@@ -53,7 +53,7 @@ ProbeDeviceAgent& DeviceTable::ReleaseDevice(ProbeDeviceAgent& device)
 	if (it == workingDevice.end()) throw exception();
 	workingDevice.erase(it);
 	freeDevice.push_back(&device);
-	DEBUG("pooi %d,free %d,used %d",devicePool.size(),freeDevice.size(),workingDevice.size());
+	DEBUG("pool %d,free %d,used %d",devicePool.size(),freeDevice.size(),workingDevice.size());
 	return device;
 }
 
