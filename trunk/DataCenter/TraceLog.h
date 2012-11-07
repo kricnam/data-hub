@@ -73,7 +73,7 @@ public:
 	static void Init(const char* Title,const char* szIP, int nPort);
 
 	static inline void SetLocalOut(bool bEnable) {bLocal = bEnable;};
-	static void SetTraceLevel(int n) { nLevel = n;};
+	static void SetTraceLevel(int n) { nLevel = n%10;};
 	void EnableSysLog(bool enable){ bSysLog = enable;};
 protected:
 	static void SetTitle(char* szBuf,int nSize);		 //send out Date,Time and Title message

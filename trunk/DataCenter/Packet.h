@@ -21,23 +21,24 @@ public:
 	} MESSAGE_ID;
 
 	Packet();
-	Packet(MESSAGE_ID id, const char* szMobileNumber)
+	Packet(MESSAGE_ID id, const char* szMobileNumber,string& strBody)
 	{
 		m_ID = id; m_strMoblieNumber = szMobileNumber;
 		m_nSerialNumber = 0;
-	}
+		PackMessage(strBody);
+	};
+
 	virtual ~Packet();
 
-
-
-	string& PackMessage(string& strBody,string& strPackBuffer);
-	MESSAGE_ID UnPackMessage(string& strRawData);
-	string m_strMoblieNumber;
-	string m_strBody;
-	unsigned int m_nSerialNumber;
-	MESSAGE_ID m_ID;
+	void Clear(void) {m_strMoblieNumber.clear();m_ID=MESSAGE_UNKNOWN;strPacketBuffer.clear();};
+	Packet& PackMessage(string& strBody);
+	Packet& UnPackMessage(string& strRawData);
+	const char* GetData(void) { return strPacketBuffer.data();};
+	unsigned int GetSize(void) {return strPacketBuffer.size();};
+	MESSAGE_ID GetMessageID(void) { return m_ID; };
 
 protected:
+	MESSAGE_ID m_ID;
 
 	enum PACKETID
 	{
@@ -74,10 +75,20 @@ protected:
 	} MessagePack;
 
 	static WORD MessageSerialNumber;
+	unsigned int m_nSerialNumber;
+	string m_strMoblieNumber;
+	string m_strBody;
+
 
 	void setHeadMobile(MessageHead& head);
 	void packHead(MessageHead& head);
 	BYTE checkSum(string& str);
+	void transformRcv(string& str);
+	void transformSnd(string& str);
+	bool verifyCheckSum();
+	void bcd2string(string& str, BCD* bcd);
+	string strPacketBuffer;
+
 };
 
 #endif /* PACKET_H_ */

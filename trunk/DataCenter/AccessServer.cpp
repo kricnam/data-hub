@@ -14,7 +14,6 @@
 #include <stdlib.h>
 #include "cppsocket/socket.h"
 #include "ProbeDevice.h"
-#include "TraceLog.h"
 
 using namespace std;
 using namespace ev;
@@ -37,6 +36,7 @@ AccessServer::~AccessServer()
 void AccessServer::Start(int nPort)
 {
 	INFO("start listening on %d",nPort);
+
 	server.start(nPort, 10);
 	incomeWatcher.set<AccessServer, &AccessServer::onIncomeConnect>(this);
 	incomeWatcher.set(server.getSocket(), ev::READ);

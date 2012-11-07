@@ -13,8 +13,7 @@ Packet::WORD Packet::MessageSerialNumber = 0;
 
 Packet::Packet()
 {
-	// TODO Auto-generated constructor stub
-
+	m_ID = MESSAGE_UNKNOWN; m_nSerialNumber = 0;
 }
 
 Packet::~Packet()
@@ -22,24 +21,45 @@ Packet::~Packet()
 	// TODO Auto-generated destructor stub
 }
 
-string& Packet::PackMessage(string& strBody,string& strPackBuffer)
+Packet& Packet::PackMessage(string& strBody)
 {
-	strPackBuffer.clear();
 	MessageHead head;
+	strPacketBuffer.clear();
 	head.MsgID = m_ID;
 	head.SerialNo = MessageSerialNumber++;
+	m_nSerialNumber = head.SerialNo;
 	setHeadMobile(head);
 	head.MsgProperty.length = strBody.size();
 	packHead(head);
-	strPackBuffer.append((const char*)&head,sizeof(head));
-	strPackBuffer.append(strBody);
-	strPackBuffer.append(1,checkSum(strPackBuffer));
-	return strPackBuffer;
+	strPacketBuffer.append((const char*)&head,sizeof(head));
+	strPacketBuffer.append(strBody);
+	strPacketBuffer.append(1,checkSum(strPacketBuffer));
+	return *this;
 }
 
-Packet::MESSAGE_ID Packet::UnPackMessage(string& strRawData)
+Packet& Packet::UnPackMessage(string& strRawData)
 {
-	return MESSAGE_UNKNOWN;
+	m_ID = MESSAGE_UNKNOWN;
+	string::size_type frameStart = strRawData.find(ID);
+	if (frameStart!=string::npos)
+	{
+		string::size_type frameEnd = strRawData.find(ID,frameStart+1);
+		if (frameEnd != string::npos)
+		{
+			strPacketBuffer = strRawData.substr(frameStart+1,frameEnd - frameStart -1);
+			strRawData.erase(frameStart,frameEnd - frameStart + 1);
+			transformRcv(strPacketBuffer);
+			if (verifyCheckSum())
+			{
+				MessageHead* ptrHead = (MessageHead*)strPacketBuffer.data();
+				m_ID = (MESSAGE_ID)ntohs(ptrHead->MsgID);
+				bcd2string(m_strMoblieNumber,ptrHead->MobileTelNo);
+				m_strBody = strPacketBuffer.substr(sizeof(MessageHead)-1,
+						strPacketBuffer.size()-1-sizeof(MessageHead));
+			}
+		}
+	}
+	return *this;
 }
 
 void Packet::setHeadMobile(MessageHead& head)
@@ -75,4 +95,41 @@ Packet::BYTE Packet::checkSum(string& str)
 		else sum ^= (*it);
 	}
 	return sum;
+}
+
+void Packet::transformRcv(string& str)
+{
+	string::size_type pos = str.find(ESC);
+	string strTmp;
+	while (pos != string::npos)
+	{
+		strTmp += str.substr(0, pos);
+		if (str.at(pos + 1) == 0x01)
+			strTmp += ESC;
+		else if (str.at(pos + 1) == 0x02)
+			strTmp += ID;
+		//else exception;
+		str.erase(0,pos+2);
+		pos = str.find(ESC);
+	};
+	if (strTmp.size()) str = strTmp;
+	return;
+}
+
+void Packet::transformSnd(string& str)
+{
+}
+
+bool Packet::verifyCheckSum()
+{
+	return checkSum(strPacketBuffer) == 0;
+}
+
+void Packet::bcd2string(string& str, BCD* bcd)
+{
+	for(int i=0;i<6;i++)
+	{
+		str+= ((bcd[i]&0xF0)>>4)+0x30;
+		str+= ((bcd[i]&0x0F))+0x30;
+	}
 }
