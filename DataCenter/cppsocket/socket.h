@@ -141,7 +141,7 @@ namespace CPPSocket
     /** The sockets can be used like a file-descriptor.
       */
     operator Descriptor() throw() { return descriptor; }
-
+    void attach(Descriptor fd) { descriptor = fd;}
     bool isOpened() throw () { return descriptor > 0; }
 
     /** Assign this socket an address. (classic)
