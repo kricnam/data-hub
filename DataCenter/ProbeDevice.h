@@ -50,7 +50,7 @@ protected:
 	string strCache;
 	int nPort;
 
-	void reponseClient(Packet& outPacket);
+	void sendToClient(Packet& outPacket);
 };
 
 #endif /* PROBEDEVICE_H_ */
