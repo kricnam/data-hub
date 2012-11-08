@@ -18,15 +18,17 @@ Protocol::~Protocol()
 	// TODO Auto-generated destructor stub
 }
 
-Packet& Protocol::Response(Packet& inPacket)
+bool Protocol::Response(Packet& inPacket)
 {
+	bool bResponsed = false;
 	switch(inPacket.GetMessageID())
 	{
 	case Packet::MESSAGE_UNKNOWN:
-
+		responsePacket.Clear();
 		break;
 	case Packet::TERMINAL_REGIST:
+		//onRegist;
 		break;
 	}
-	return responsePacket;
+	return bResponsed;
 }

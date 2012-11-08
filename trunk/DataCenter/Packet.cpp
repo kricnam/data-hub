@@ -8,6 +8,7 @@
 #include "Packet.h"
 #include <string.h>
 #include <arpa/inet.h>
+#include "TraceLog.h"
 
 Packet::WORD Packet::MessageSerialNumber = 0;
 
@@ -21,7 +22,7 @@ Packet::~Packet()
 	// TODO Auto-generated destructor stub
 }
 
-Packet& Packet::PackMessage(string& strBody)
+string& Packet::PackMessage(string& strBody)
 {
 	MessageHead head;
 	strPacketBuffer.clear();
@@ -29,15 +30,17 @@ Packet& Packet::PackMessage(string& strBody)
 	head.SerialNo = MessageSerialNumber++;
 	m_nSerialNumber = head.SerialNo;
 	setHeadMobile(head);
-	head.MsgProperty.length = strBody.size();
+	head.MsgProperty.dummy = 0;
+	head.MsgProperty.value.length = strBody.size();
 	packHead(head);
 	strPacketBuffer.append((const char*)&head,sizeof(head));
 	strPacketBuffer.append(strBody);
 	strPacketBuffer.append(1,checkSum(strPacketBuffer));
-	return *this;
+	transformSnd(strPacketBuffer);
+	return strPacketBuffer;
 }
 
-Packet& Packet::UnPackMessage(string& strRawData)
+bool Packet::Parse(string& strRawData)
 {
 	m_ID = MESSAGE_UNKNOWN;
 	string::size_type frameStart = strRawData.find(ID);
@@ -51,15 +54,19 @@ Packet& Packet::UnPackMessage(string& strRawData)
 			transformRcv(strPacketBuffer);
 			if (verifyCheckSum())
 			{
-				MessageHead* ptrHead = (MessageHead*)strPacketBuffer.data();
-				m_ID = (MESSAGE_ID)ntohs(ptrHead->MsgID);
-				bcd2string(m_strMoblieNumber,ptrHead->MobileTelNo);
+				MessageHead Head = *((MessageHead*)strPacketBuffer.data());
+				m_ID = (MESSAGE_ID)ntohs(Head.MsgID);
+				Head.MsgProperty.dummy = ntohs(Head.MsgProperty.dummy);
+				m_nSerialNumber = ntohs(Head.SerialNo);
+				bcd2string(m_strMoblieNumber,Head.MobileTelNo);
 				m_strBody = strPacketBuffer.substr(sizeof(MessageHead)-1,
 						strPacketBuffer.size()-1-sizeof(MessageHead));
+				TRACE("Head.Length=%d @ %d",Head.MsgProperty.value.length,m_strBody.size());
+				return true;
 			}
 		}
 	}
-	return *this;
+	return false;
 }
 
 void Packet::setHeadMobile(MessageHead& head)
@@ -80,8 +87,8 @@ void Packet::setHeadMobile(MessageHead& head)
 void Packet::packHead(MessageHead& head)
 {
 	head.MsgID = htons(head.MsgID);
-	WORD n =htons(*(WORD*)&head.MsgProperty);
-	head.MsgProperty = *(MessageProp*)&n;
+	WORD n =htons(head.MsgProperty.dummy);
+	head.MsgProperty.dummy = n;
 	head.SerialNo = htons(head.SerialNo);
 }
 
@@ -118,6 +125,24 @@ void Packet::transformRcv(string& str)
 
 void Packet::transformSnd(string& str)
 {
+	string::iterator it;
+	string strTmp;
+	for (it = str.begin(); it != str.end() ; it++)
+	{
+		if	((*it) == ID)
+		{
+			strTmp.append(1,ESC).append(1,0x02);
+			continue;
+		}
+		if ((*it) == ESC)
+		{
+			strTmp.append(1,ESC).append(1,0x01);
+			continue;
+		}
+		strTmp += (*it);
+	}
+	str = strTmp;
+	return;
 }
 
 bool Packet::verifyCheckSum()

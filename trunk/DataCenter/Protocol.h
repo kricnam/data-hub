@@ -8,14 +8,16 @@
 #ifndef PROTOCOL_H_
 #define PROTOCOL_H_
 #include "Packet.h"
+#include "PacketQueue.h"
 class Protocol
 {
 public:
 	Protocol();
 	virtual ~Protocol();
 
-	Packet& Response(Packet& inPacket);
+	bool Response(Packet& inPacket);
 protected:
+	PacketQueue outQueue;
 	Packet responsePacket;
 };
 

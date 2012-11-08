@@ -45,7 +45,16 @@ void ProbeDeviceAgent::OnReadClient(io& watcher, int revent)
 			TRACE("read %d bytes", n);
 			Packet packet;
 			strCache.append(buffer,n);
-			reponseClient(protocol.Response(packet.UnPackMessage(strCache)));
+			if (packet.Parse(strCache))
+			{
+				if (protocol.Response(packet))
+				{
+					if (!IOWriteWatch.is_active())
+					{
+						IOWriteWatch.start();
+					}
+				}
+			}
 		}
 		else
 		{
@@ -74,6 +83,8 @@ void ProbeDeviceAgent::OnDisconnect(async& watcher, int revent)
 void ProbeDeviceAgent::OnWriteClient(io& watcher, int revent)
 {
 	TRACE("enter");
+	//if protocol get sent packet, then send, if ok ,pop it, if send queue empty stop watch
+	//
 	IOWriteWatch.stop();
 }
 
@@ -100,12 +111,15 @@ void ProbeDeviceAgent::SetConnect(int socket)
 
 }
 
-void ProbeDeviceAgent::reponseClient(Packet& outPacket)
+void ProbeDeviceAgent::sendToClient(Packet& outPacket)
 {
 	try
 	{
 		if (&outPacket)
+		{
+
 			clientSocket.send(outPacket.GetData(),outPacket.GetSize(),MSG_DONTWAIT);
+		}
 	}
 	catch(LibCException& e)
 	{
