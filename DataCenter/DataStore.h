@@ -21,7 +21,7 @@ public:
 	{
 		int nProvince;
 		int nCity;
-		string Manufactture;
+		string Manufacture;
 		string TerminalType;
 		string TerminalID;
 		char cTermialColor;

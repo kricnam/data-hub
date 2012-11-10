@@ -29,8 +29,21 @@ public:
 	} __attribute__ ((packed)) TerminalRegiste;
 
 	string& GetTerminalVIN();
+	int GetProvinceCode();
+	int GetCityCode();
+	string& GetManufacture();
+	string& GetType();
+	string& GetTerminalID();
+	int GetColor();
+
 protected:
 	string strVIN;
+	int nProvince;
+	int nCity;
+	string strManufacture;
+	string strType;
+	string strID;
+	int nColorCode;
 };
 
 #endif /* REGISTPACKET_H_ */
