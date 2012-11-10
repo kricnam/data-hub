@@ -6,11 +6,16 @@
  */
 
 #include "Protocol.h"
+#include "RegistPacket.h"
+#include "DataStore.h"
+#include <string>
+
+using namespace std;
 
 Protocol::Protocol()
 {
-	// TODO Auto-generated constructor stub
-
+	tResponseTimeOut = 10;
+	nResponseTimeOutCount = 0;
 }
 
 Protocol::~Protocol()
@@ -24,11 +29,25 @@ bool Protocol::Response(Packet& inPacket)
 	switch(inPacket.GetMessageID())
 	{
 	case Packet::MESSAGE_UNKNOWN:
-		responsePacket.Clear();
+		bResponsed = onRegist(inPacket);
 		break;
 	case Packet::TERMINAL_REGIST:
 		//onRegist;
 		break;
+	default:
+		break;
 	}
 	return bResponsed;
+}
+
+bool Protocol::onRegist(Packet& inPacket)
+{
+	RegistPacket Register(inPacket);
+	DataStore data;
+	string& strVIN = Register.GetTerminalVIN();
+	if (data.FindTerminalRecord(strVIN.c_str()))
+	{
+
+	}
+	return false;
 }

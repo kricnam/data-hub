@@ -11,8 +11,11 @@ LIBS =   -lev
 
 TARGET =	DataCenter
 
-$(TARGET):	$(OBJS)  
-	$(CXX) -o $(TARGET) $(OBJS) $(LIBS)
+#$(TARGET):	$(OBJS)  
+
+$(TARGET):	$(CPPSOCKET_SRC) $(wildcard *.cpp)
+	$(CXX) -o $(TARGET) $^ $(LIBS)
+
 
 all:	$(TARGET)
 

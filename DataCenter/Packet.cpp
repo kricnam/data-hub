@@ -19,7 +19,7 @@ Packet::Packet()
 
 Packet::~Packet()
 {
-	// TODO Auto-generated destructor stub
+
 }
 
 string& Packet::PackMessage(string& strBody)
@@ -62,6 +62,7 @@ bool Packet::Parse(string& strRawData)
 				m_strBody = strPacketBuffer.substr(sizeof(MessageHead)-1,
 						strPacketBuffer.size()-1-sizeof(MessageHead));
 				TRACE("Head.Length=%d @ %d",Head.MsgProperty.value.length,m_strBody.size());
+				strPacketBuffer.clear();
 				return true;
 			}
 		}
@@ -148,6 +149,11 @@ void Packet::transformSnd(string& str)
 bool Packet::verifyCheckSum()
 {
 	return checkSum(strPacketBuffer) == 0;
+}
+
+void Packet::Dump(void)
+{
+	DEBUG("%u:size=%u",m_ID,m_nSerialNumber,m_strBody.size());
 }
 
 void Packet::bcd2string(string& str, BCD* bcd)
