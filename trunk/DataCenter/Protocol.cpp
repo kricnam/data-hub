@@ -7,6 +7,7 @@
 
 #include "Protocol.h"
 #include "RegistPacket.h"
+#include "RegistResponsePacket.h"
 #include "DataStore.h"
 #include <string>
 
@@ -44,19 +45,45 @@ bool Protocol::onRegist(Packet& inPacket)
 {
 	RegistPacket Register(inPacket);
 	DataStore data;
-	string& strVIN = Register.GetTerminalVIN();
-	if (data.FindTerminalRecord(strVIN.c_str()))
+	RegistResponsePacket::REGIST_RESULT_CODE result = RegistResponsePacket::REGISTE_OK;
+	DataStore::Vehicle_Record record;
+	do
 	{
-		DataStore::Vehicle_Record record;
-		record.Manufacture = Register.GetManufacture();
-		record.TerminalID = Register.GetTerminalID();
-		record.TerminalType = Register.GetType();
-		record.VechicleID = Register.GetTerminalVIN();
-		record.cTermialColor = Register.GetColor();
-		record.nProvince = Register.GetProvinceCode();
-		record.nCity = Register.GetCityCode();
-		data.UpdateTerminalRecord(record);
-	}
+		if (!data.FindTerminalRecord(Register.GetTerminalID().c_str()))
+		{
+			result = RegistResponsePacket::NO_RECORED_VEHICLE;
+			break;
+		}
 
+		if (!data.FindVechileRecord(Register.GetTerminalVIN().c_str()))
+		{
+			result = RegistResponsePacket::NO_RECORDER_TERMINAL;
+			break;
+		}
+
+		if (data.GetVechicleRecord(record))
+		{
+			if (record.TerminalID.empty())
+			{
+				record.Manufacture = Register.GetManufacture();
+				record.TerminalID = Register.GetTerminalID();
+				record.TerminalType = Register.GetType();
+				record.VechicleID = Register.GetTerminalVIN();
+				record.cTermialColor = Register.GetColor();
+				record.nProvince = Register.GetProvinceCode();
+				record.nCity = Register.GetCityCode();
+				if (!data.RegisteTerminal(record))
+					result = RegistResponsePacket::DUP_REGISTED_TERMINAL;
+			}
+			else
+				result = RegistResponsePacket::DUP_REGISTED_VEHICLE;
+		}
+
+	} while (false);
+
+	RegistResponsePacket response(inPacket.GetSerialNumber(),
+			inPacket.GetMobileNumber().c_str(),result,record.strAuthCode.c_str());
+
+	outQueue.Push(response);
 	return true;
 }
