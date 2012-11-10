@@ -10,6 +10,9 @@
 #include <string>
 
 using namespace std;
+
+#define FETCH_BYTES(x,y)   x.assign((const char*)y,sizeof(y))
+
 class Packet
 {
 public:
@@ -139,6 +142,7 @@ protected:
 	void transformSnd(string& str);
 	bool verifyCheckSum();
 	void bcd2string(string& str, BCD* bcd);
+
 	string strPacketBuffer;
 
 };

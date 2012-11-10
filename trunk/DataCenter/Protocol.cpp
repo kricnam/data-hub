@@ -47,7 +47,16 @@ bool Protocol::onRegist(Packet& inPacket)
 	string& strVIN = Register.GetTerminalVIN();
 	if (data.FindTerminalRecord(strVIN.c_str()))
 	{
-
+		DataStore::Vehicle_Record record;
+		record.Manufacture = Register.GetManufacture();
+		record.TerminalID = Register.GetTerminalID();
+		record.TerminalType = Register.GetType();
+		record.VechicleID = Register.GetTerminalVIN();
+		record.cTermialColor = Register.GetColor();
+		record.nProvince = Register.GetProvinceCode();
+		record.nCity = Register.GetCityCode();
+		data.UpdateTerminalRecord(record);
 	}
-	return false;
+
+	return true;
 }
