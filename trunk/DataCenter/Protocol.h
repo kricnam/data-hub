@@ -9,6 +9,7 @@
 #define PROTOCOL_H_
 #include "Packet.h"
 #include "PacketQueue.h"
+#include "time.h"
 class Protocol
 {
 public:
@@ -18,7 +19,10 @@ public:
 	bool Response(Packet& inPacket);
 protected:
 	PacketQueue outQueue;
-	Packet responsePacket;
+	time_t tResponseTimeOut;
+	int nResponseTimeOutCount;
+
+	bool onRegist(Packet& inPacket);
 };
 
 #endif /* PROTOCOL_H_ */

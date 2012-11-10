@@ -45,6 +45,7 @@ public:
 	typedef unsigned char BCD;
 
 	Packet();
+
 	Packet(MESSAGE_ID id, const char* szMobileNumber,string& strBody)
 	{
 		m_ID = id; m_strMoblieNumber = szMobileNumber;
@@ -61,16 +62,7 @@ public:
 		BYTE Result;
 	} __attribute__ ((packed)) GENERALResponse;
 
-	typedef struct _TerminalRegiste
-	{
-		WORD Province;
-		WORD City;
-		BYTE Manufacture[5];
-		BYTE TerminalType[8];
-		BYTE TerminalID[7];
-		BYTE BodyColor;
-		BYTE VIN[1];
-	} __attribute__ ((packed)) TerminalRegiste;
+
 
 	typedef struct _TerminalRegisteResponse
 	{
@@ -86,13 +78,14 @@ public:
 		BYTE  Value[1];
 	}  __attribute__ ((packed)) TerminalParameterItem ;
 
-	void Clear(void) {m_strMoblieNumber.clear();m_ID=MESSAGE_UNKNOWN;strPacketBuffer.clear();};
+	void  virtual Clear(void) {m_strMoblieNumber.clear();m_ID=MESSAGE_UNKNOWN;strPacketBuffer.clear();};
 	string& PackMessage(string& strBody);
 	bool Parse(string& strRawData);
 	const char* GetData(void) { return strPacketBuffer.data();};
 	unsigned int GetSize(void) {return strPacketBuffer.size();};
 	MESSAGE_ID GetMessageID(void) { return m_ID; };
-
+	void SetMessageID(MESSAGE_ID id) { m_ID = id;};
+	void virtual Dump(void);
 protected:
 	MESSAGE_ID m_ID;
 
