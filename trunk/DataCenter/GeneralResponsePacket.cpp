@@ -38,3 +38,13 @@ void GeneralResponsePacket::SetResponse(WORD nSerialNo,MESSAGE_ID message,
 	response.Result = result;
 	m_strBody.assign((const char*)&response,sizeof(response));
 }
+
+GeneralResponsePacket::GENERAL_RESULT_CODE GeneralResponsePacket::GetResponeResult(WORD& onSerialNo,
+		MESSAGE_ID& onMessage)
+{
+	GENERALResponse* ptrR;
+	ptrR = (GENERALResponse*)m_strBody.data();
+	onSerialNo = ntohs(ptrR->ResponsSN);
+	onMessage =(MESSAGE_ID) ntohs(ptrR->ResponsID);
+	return (GENERAL_RESULT_CODE)ptrR->Result;
+}
