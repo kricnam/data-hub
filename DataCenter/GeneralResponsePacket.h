@@ -31,6 +31,7 @@ public:
 	GeneralResponsePacket(Packet& packet);
 	GeneralResponsePacket(Packet& packet,GENERAL_RESULT_CODE result);
 	void SetResponse(WORD nSerialNo, MESSAGE_ID message, GENERAL_RESULT_CODE result);
+	GENERAL_RESULT_CODE GetResponeResult(WORD& onSerialNo, MESSAGE_ID& onMessage);
 };
 
 #endif /* GENERALRESPONSEPACKET_H_ */
