@@ -25,19 +25,14 @@ PacketQueue::~PacketQueue()
 
 void PacketQueue::Push(Packet& data)
 {
-
-	TRACE("data,size %d",data.GetSize());
-	if (data.GetSize())
+	try
 	{
-		try
-		{
-			queue.push_back(data);
-		}
-		catch(exception& ex)
-		{
-			ERROR(ex.what());
-		}
+		queue.push_back(data);
+	} catch (exception& ex)
+	{
+		ERROR(ex.what());
 	}
+
 }
 
 Packet& PacketQueue::Front(void)
@@ -49,9 +44,10 @@ Packet& PacketQueue::GetAt(int i)
 {
 	list<Packet>::iterator it;
 	int count = 0;
-	for(it = queue.begin();it!=queue.end();it++)
+	for (it = queue.begin(); it != queue.end(); it++)
 	{
-		if (count++== i) break;
+		if (count++ == i)
+			break;
 	}
 	return (*it);
 }
@@ -61,8 +57,7 @@ void PacketQueue::Pop(void)
 	try
 	{
 		queue.pop_front();
-	}
-	catch(exception &ex)
+	} catch (exception &ex)
 	{
 		ERROR(ex.what());
 	}
@@ -70,72 +65,79 @@ void PacketQueue::Pop(void)
 
 void PacketQueue::Save(const char* szFile)
 {
-	DEBUG("Save to %s",szFile);
-	int fd = open(szFile,O_CREAT|O_WRONLY|O_TRUNC,S_IRWXU);
+	DEBUG("Save to %s", szFile);
+	int fd = open(szFile, O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU);
 	if (fd < 0)
 	{
-		ERRTRACE();
+		ERRTRACE()
+		;
 		return;
 	}
 	list<Packet>::iterator it;
-	for(it = queue.begin();it!=queue.end();it++)
+	for (it = queue.begin(); it != queue.end(); it++)
 	{
-		int n = (*it).GetSize();
-		if (n)
-		{
-			if (write(fd,&n,sizeof(n))!=sizeof(n))
-			{
-				ERRTRACE();
-				break;
-			}
-			if (n!=write(fd,(*it).GetData(),n))
-			{
-				ERRTRACE();
-				break;
-			}
-		}
+//		int n = (*it).GetSize();
+//		if (n)
+//		{
+//			if (write(fd, &n, sizeof(n)) != sizeof(n))
+//			{
+//				ERRTRACE()
+//				;
+//				break;
+//			}
+//			if (n != write(fd, (*it).GetData(), n))
+//			{
+//				ERRTRACE()
+//				;
+//				break;
+//			}
+//		}
 	}
 //	if (fdatasync(fd)<0)
 //		ERRTRACE();
-	if (close(fd)<0)
-		ERRTRACE();
+	if (close(fd) < 0)
+		ERRTRACE()
+	;
 }
 
 void PacketQueue::Load(const char* szFile)
 {
-	INFO("Load from %s",szFile);
-	FILE* fd = fopen(szFile,"rb");
+	INFO("Load from %s", szFile);
+	FILE* fd = fopen(szFile, "rb");
 	if (fd == NULL)
 	{
-		ERRTRACE();
+		ERRTRACE()
+		;
 		return;
 	}
 	queue.clear();
-	while(!feof(fd))
+	while (!feof(fd))
 	{
 		int n;
-		if (fread(&n,sizeof(n),1,fd)< 1)
+		if (fread(&n, sizeof(n), 1, fd) < 1)
 			break;
 
-		if (n>0 && n < 5000)
+		if (n > 0 && n < 5000)
 		{
 			char* buf = new char[n];
-			if (buf && (fread(buf,n,1,fd)== 1))
+			if (buf && (fread(buf, n, 1, fd) == 1))
 			{
-				Packet packet;
-
-				if (packet.GetSize()) Push(packet);
-				else
-				{
-					WARNING("Invalid data");
-					DUMP(packet.GetData(),packet.GetSize());
-				}
+//				Packet packet;
+//
+//				if (packet.GetSize())
+//					Push(packet);
+//				else
+//				{
+//					WARNING("Invalid data");
+//					DUMP(packet.GetData(), packet.GetSize());
+//				}
 			}
 			else
 			{
 				WARNING("Invalid data,file maybe corrupted.");
 			}
-			if (buf) delete buf;
+			if (buf)
+				delete buf;
 		}
 		else
 		{
@@ -145,7 +147,6 @@ void PacketQueue::Load(const char* szFile)
 	fclose(fd);
 	//if (remove(szFile)!=0)
 	//	ERRTRACE();
-	INFO("Total %d records loaded",queue.size());
+	INFO("Total %d records loaded", queue.size());
 }
-
 

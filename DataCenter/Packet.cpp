@@ -28,13 +28,12 @@ string& Packet::PackMessage(string& strBody)
 	MessageHead head;
 	strPacketBuffer.clear();
 	head.MsgID = m_ID;
-	head.SerialNo = MessageSerialNumber++;
-	m_nSerialNumber = head.SerialNo;
+	head.SerialNo = m_nSerialNumber;
 	setHeadMobile(head);
 	head.MsgProperty.dummy = 0;
 	head.MsgProperty.value.length = strBody.size();
 	packHead(head);
-	strPacketBuffer.append((const char*) &head, sizeof(head));
+	strPacketBuffer.assign((const char*) &head, sizeof(head));
 	strPacketBuffer.append(strBody);
 	strPacketBuffer.append(1, checkSum(strPacketBuffer));
 	transformSnd(strPacketBuffer);
@@ -93,8 +92,7 @@ void Packet::setHeadMobile(MessageHead& head)
 void Packet::packHead(MessageHead& head)
 {
 	head.MsgID = htons(head.MsgID);
-	WORD n = htons(head.MsgProperty.dummy);
-	head.MsgProperty.dummy = n;
+	head.MsgProperty.dummy = htons(head.MsgProperty.dummy);
 	head.SerialNo = htons(head.SerialNo);
 }
 

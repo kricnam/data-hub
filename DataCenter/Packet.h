@@ -8,6 +8,7 @@
 #ifndef PACKET_H_
 #define PACKET_H_
 #include <string>
+#include <arpa/inet.h>
 
 using namespace std;
 
@@ -22,13 +23,9 @@ public:
 		TERMINAL_GENERAL_HEARTBEAT,
 		TERMINAL_REGIST = 0x0100,
 		TERMINAL_REGIST_RESPONSE = 0x8100,
+		PLATEFORM_GENERAL_RESPONS = 0x8001,
 		MESSAGE_UNKNOWN
 	} MESSAGE_ID;
-
-	typedef enum _GENERAL_RESULT_CODE
-	{
-		SUCCESS = 0, FAIL, ERROR_MESSAGE, NO_SUPPORTED, ALARM_AFIMITIV
-	} GENERAL_RESULT_CODE;
 
 	typedef unsigned short WORD;
 	typedef unsigned char BYTE;
@@ -41,19 +38,14 @@ public:
 	{
 		m_ID = id;
 		m_strMoblieNumber = szMobileNumber;
-		m_nSerialNumber = 0;
-		PackMessage(strBody);
+		m_nSerialNumber = MessageSerialNumber++;
+		m_strBody = strBody;
 	}
 	;
 
 	virtual ~Packet();
 
-	typedef struct _GENERALResponse
-	{
-		WORD ResponsSN;
-		WORD ResponsID;
-		BYTE Result;
-	}__attribute__ ((packed)) GENERALResponse;
+
 
 	typedef struct _TerminalParameterItem
 	{
@@ -71,16 +63,7 @@ public:
 	;
 	string& PackMessage(string& strBody);
 	bool Parse(string& strRawData);
-	const char* GetData(void)
-	{
-		return strPacketBuffer.data();
-	}
-	;
-	unsigned int GetSize(void)
-	{
-		return strPacketBuffer.size();
-	}
-	;
+
 	MESSAGE_ID GetMessageID(void)
 	{
 		return m_ID;

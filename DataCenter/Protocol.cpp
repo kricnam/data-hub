@@ -29,13 +29,15 @@ bool Protocol::Response(Packet& inPacket)
 	bool bResponsed = false;
 	switch(inPacket.GetMessageID())
 	{
-	case Packet::MESSAGE_UNKNOWN:
+	case Packet::TERMINAL_REGIST:
 		bResponsed = onRegist(inPacket);
 		break;
-	case Packet::TERMINAL_REGIST:
-		//onRegist;
+	case Packet::MESSAGE_UNKNOWN:
+
 		break;
 	default:
+		GeneralResponsePacket respons(inPacket,GeneralResponsePacket::NO_SUPPORTED);
+		outQueue.Push(respons);
 		break;
 	}
 	return bResponsed;

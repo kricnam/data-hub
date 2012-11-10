@@ -118,7 +118,7 @@ void ProbeDeviceAgent::sendToClient(Packet& outPacket)
 		if (&outPacket)
 		{
 
-			clientSocket.send(outPacket.GetData(),outPacket.GetSize(),MSG_DONTWAIT);
+			//clientSocket.send(outPacket.GetData(),outPacket.GetSize(),MSG_DONTWAIT);
 		}
 	}
 	catch(LibCException& e)
