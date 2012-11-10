@@ -18,12 +18,22 @@ DataStore::~DataStore()
 	// TODO Auto-generated destructor stub
 }
 
-bool DataStore::UpdateTerminalRecord(Vehicle_Record& record)
+bool DataStore::RegisteTerminal(Vehicle_Record& record)
+{
+	return true;
+}
+
+bool DataStore::FindVechileRecord(const char* szVechicleID)
 {
 	return true;
 }
 
 bool DataStore::FindTerminalRecord(const char* VechicleID)
+{
+	return true;
+}
+
+bool DataStore::GetVechicleRecord(Vehicle_Record& record)
 {
 	return true;
 }

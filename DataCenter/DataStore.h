@@ -27,10 +27,13 @@ public:
 		char cTermialColor;
 		string VechicleID;
 		string TerminalMobileNumber;
+		string strAuthCode;
 	} Vehicle_Record;
 
-	bool UpdateTerminalRecord(Vehicle_Record& record);
-	bool FindTerminalRecord(const char* VechicleID);
+	bool RegisteTerminal(Vehicle_Record& record);
+	bool FindVechileRecord(const char* szVechicleID);
+	bool FindTerminalRecord(const char* szTerminalID);
+	bool GetVechicleRecord(Vehicle_Record& record);
 };
 
 #endif /* DATASTORE_H_ */
