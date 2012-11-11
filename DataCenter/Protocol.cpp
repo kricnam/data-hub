@@ -11,6 +11,7 @@
 #include "GeneralResponsePacket.h"
 #include "DataStore.h"
 #include <string>
+#include "TraceLog.h"
 
 using namespace std;
 
@@ -119,20 +120,23 @@ string& Protocol::GetSendData(void)
 	Packet& packet = outQueue.Front();
 	packet.SetSendTime(time(NULL));
 	time_t timeOut = packet.GetTimeOut();
-	if (timeOut == 0) timeOut = tResponseTimeOut;
-	timeOut = (packet.GetTransmitCount()+1) * timeOut;
+	if (timeOut == 0)
+		timeOut = tResponseTimeOut;
+	timeOut = (packet.GetTransmitCount() + 1) * timeOut;
 	packet.SetTimeOut(timeOut);
 	return packet.PackMessage();
 }
 
 void Protocol::OnSendResponseOK(void)
 {
-	outQueue.Pop();
+	if (outQueue.GetSize() && outQueue.Front().m_bResponse)
+		outQueue.Pop();
 }
 
 int Protocol::SendQueueReady(void)
 {
-	if (outQueue.GetSize() < 1) return 0;
+	if (outQueue.GetSize() < 1)
+		return 0;
 	Packet& packet = outQueue.Front();
 	time_t tSendTime = packet.GetSendTime();
 	if (tSendTime == 0)
@@ -143,6 +147,8 @@ int Protocol::SendQueueReady(void)
 	{
 		if (packet.GetTransmitCount() > nRetryLimit)
 		{
+			WARNING(
+					"send packet fail after %d retry", packet.GetTransmitCount());
 			outQueue.Pop();
 			return outQueue.GetSize();
 		}
@@ -156,7 +162,8 @@ int Protocol::SendQueueReady(void)
 
 time_t Protocol::GetResponseTimeOut(void)
 {
-	if (outQueue.GetSize()<1) return 0;
+	if (outQueue.GetSize() < 1)
+		return 0;
 	return outQueue.Front().GetTimeOut();
 }
 
