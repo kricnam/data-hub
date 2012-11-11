@@ -28,7 +28,7 @@ bool DataStore::FindVechileRecord(const char* szVechicleID)
 	return true;
 }
 
-bool DataStore::FindTerminalRecord(const char* VechicleID)
+bool DataStore::FindTerminalRecord(const char* TerminalID)
 {
 	return true;
 }

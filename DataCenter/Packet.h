@@ -24,6 +24,7 @@ public:
 		TERMINAL_REGIST = 0x0100,
 		TERMINAL_REGIST_RESPONSE = 0x8100,
 		PLATEFORM_GENERAL_RESPONS = 0x8001,
+		TERMINAL_AUTHORIZE = 0x0102,
 		MESSAGE_UNKNOWN
 	} MESSAGE_ID;
 
@@ -40,13 +41,14 @@ public:
 		m_strMoblieNumber = szMobileNumber;
 		m_nSerialNumber = MessageSerialNumber++;
 		m_strBody = strBody;
+		m_bCheckSumError = false;
 	}
 	;
 
 	virtual ~Packet();
 
 
-
+	bool m_bCheckSumError;
 	typedef struct _TerminalParameterItem
 	{
 		DWORD ParameterID;
