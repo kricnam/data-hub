@@ -10,6 +10,7 @@
 GeneralResponsePacket::GeneralResponsePacket()
 {
 	m_ID = PLATEFORM_GENERAL_RESPONS;
+	m_bResponse = true;
 }
 
 GeneralResponsePacket::~GeneralResponsePacket()
@@ -26,6 +27,7 @@ GeneralResponsePacket::GeneralResponsePacket(Packet& packet,
 		GENERAL_RESULT_CODE result):Packet(packet)
 {
 	m_ID = PLATEFORM_GENERAL_RESPONS;
+	m_bResponse = true;
 	SetResponse(packet.GetSerialNumber(),packet.GetMessageID(),result);
 }
 

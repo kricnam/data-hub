@@ -46,6 +46,7 @@ public:
 		tSendTime = 0;
 		nTransmitCount = 0;
 		tTimeOut = 0;
+		m_bResponse = false;
 	}
 	;
 
@@ -100,7 +101,9 @@ public:
 	int GetTransmitCount(void) { return nTransmitCount;};
 	void SetTimeOut(time_t t) { tTimeOut = t;};
 	time_t GetTimeOut(void) { return tTimeOut;};
+
 	void virtual Dump(void);
+	bool m_bResponse;
 protected:
 	MESSAGE_ID m_ID;
 

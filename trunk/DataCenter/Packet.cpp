@@ -20,6 +20,7 @@ Packet::Packet()
 	tSendTime = 0;
 	nTransmitCount = 0;
 	tTimeOut = 0;
+	m_bResponse = false;
 }
 
 Packet::~Packet()

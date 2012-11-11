@@ -11,6 +11,7 @@
 RegistResponsePacket::RegistResponsePacket()
 {
 	m_ID = TERMINAL_REGIST_RESPONSE;
+	m_bResponse = true;
 }
 
 RegistResponsePacket::RegistResponsePacket(int SerialNo,
@@ -24,6 +25,7 @@ RegistResponsePacket::RegistResponsePacket(int SerialNo,
 	m_strBody.assign((const char*) &response,
 			sizeof(response) - sizeof(response.AuthCode));
 	m_strBody += szAuthSting;
+	m_bResponse = true;
 }
 
 RegistResponsePacket::~RegistResponsePacket()

@@ -37,7 +37,6 @@ void ProbeDeviceAgent::OnReadClient(io& watcher, int revent)
 {
 	TRACE("%s:%u,[%d]", strIP.c_str(), nPort, revent);
 
-
 	do
 	{
 		char buffer[4096];
@@ -93,9 +92,10 @@ void ProbeDeviceAgent::OnWriteClient(io& watcher, int revent)
 		try
 		{
 			clientSocket.send(strData.data(), strData.size(), MSG_DONTWAIT);
+			protocol.OnSendResponseOK();
 		} catch (LibCException& e)
 		{
-			if (e.getCode() != EAGAIN)
+			if (e.getCode() != EAGAIN && e.getCode() != EWOULDBLOCK)
 			{
 				DisconnectSignal.send();
 			}
@@ -105,7 +105,7 @@ void ProbeDeviceAgent::OnWriteClient(io& watcher, int revent)
 	{
 		IOWriteWatch.stop();
 		time_t timeout = protocol.GetResponseTimeOut();
-		TRACE("set timeout %u",timeout);
+		TRACE("set timeout %u", timeout);
 		if (timeout)
 		{
 			TimerWatch.repeat = timeout;
