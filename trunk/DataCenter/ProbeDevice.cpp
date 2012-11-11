@@ -35,32 +35,33 @@ ProbeDeviceAgent::~ProbeDeviceAgent()
 
 void ProbeDeviceAgent::OnReadClient(io& watcher, int revent)
 {
-	TRACE("%s:%u,[%d]",strIP.c_str(),nPort,revent);
+	TRACE("%s:%u,[%d]", strIP.c_str(), nPort, revent);
 	do
 	{
 		char buffer[4096];
-		int n = clientSocket.recv(buffer,4096,0);
-		if (n > 0 )
+		int n = clientSocket.recv(buffer, 4096, 0);
+		if (n > 0)
 		{
 			TRACE("read %d bytes", n);
 			Packet packet;
-			strCache.append(buffer,n);
+			strCache.append(buffer, n);
 			if (packet.Parse(strCache))
 			{
 				if (protocol.Response(packet))
 				{
 					if (!IOWriteWatch.is_active())
-					{
 						IOWriteWatch.start();
-					}
+				}
+				else
+				{
+					if (protocol.m_bCloseConnect)
+						break;
 				}
 			}
 		}
-		else
-		{
-			DisconnectSignal.send();
-		}
+		return;
 	} while (false);
+	DisconnectSignal.send();
 }
 
 void ProbeDeviceAgent::OnTimeOut(timer& watcher, int revent)
@@ -92,22 +93,21 @@ void ProbeDeviceAgent::SetConnect(int socket)
 {
 	clientSocket.attach(socket);
 
-	IOReadWatch.set<ProbeDeviceAgent,&ProbeDeviceAgent::OnReadClient>(this);
-	IOReadWatch.set(socket,ev::READ);
+	IOReadWatch.set<ProbeDeviceAgent, &ProbeDeviceAgent::OnReadClient>(this);
+	IOReadWatch.set(socket, ev::READ);
 	IOReadWatch.start();
 
-	IOWriteWatch.set<ProbeDeviceAgent,&ProbeDeviceAgent::OnWriteClient>(this);
-	IOWriteWatch.set(socket,ev::WRITE);
+	IOWriteWatch.set<ProbeDeviceAgent, &ProbeDeviceAgent::OnWriteClient>(this);
+	IOWriteWatch.set(socket, ev::WRITE);
 	IOWriteWatch.start();
 
-	DisconnectSignal.set<ProbeDeviceAgent,&ProbeDeviceAgent::OnDisconnect>(this);
+	DisconnectSignal.set<ProbeDeviceAgent, &ProbeDeviceAgent::OnDisconnect>(
+			this);
 	DisconnectSignal.start();
 
-	TimerWatch.set<ProbeDeviceAgent,&ProbeDeviceAgent::OnTimeOut>(this);
+	TimerWatch.set<ProbeDeviceAgent, &ProbeDeviceAgent::OnTimeOut>(this);
 	TimerWatch.repeat = 30;
 	TimerWatch.start();
-
-
 
 }
 
@@ -120,8 +120,7 @@ void ProbeDeviceAgent::sendToClient(Packet& outPacket)
 
 			//clientSocket.send(outPacket.GetData(),outPacket.GetSize(),MSG_DONTWAIT);
 		}
-	}
-	catch(LibCException& e)
+	} catch (LibCException& e)
 	{
 		if (e.getCode() == EAGAIN)
 		{

@@ -16,6 +16,7 @@ Packet::Packet()
 {
 	m_ID = MESSAGE_UNKNOWN;
 	m_nSerialNumber = 0;
+	m_bCheckSumError = false;
 }
 
 Packet::~Packet()
@@ -67,6 +68,8 @@ bool Packet::Parse(string& strRawData)
 				strPacketBuffer.clear();
 				return true;
 			}
+			else
+				m_bCheckSumError = true;
 		}
 	}
 	return false;
