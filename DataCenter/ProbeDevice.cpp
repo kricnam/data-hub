@@ -58,8 +58,8 @@ void ProbeDeviceAgent::OnReadClient(io& watcher, int revent)
 						break;
 				}
 			}
+			return;
 		}
-		return;
 	} while (false);
 	DisconnectSignal.send();
 }
