@@ -85,8 +85,22 @@ void ProbeDeviceAgent::OnWriteClient(io& watcher, int revent)
 {
 	TRACE("enter");
 	//if protocol get sent packet, then send, if ok ,pop it, if send queue empty stop watch
-	//
-	IOWriteWatch.stop();
+	if (protocol.SendQueueSize())
+	{
+		string& strData = protocol.GetSendData();
+		try
+		{
+			clientSocket.send(strData.data(), strData.size(), MSG_DONTWAIT);
+		} catch (LibCException& e)
+		{
+			if (e.getCode() != EAGAIN)
+			{
+				DisconnectSignal.send();
+			}
+		}
+	}
+	else
+		IOWriteWatch.stop();
 }
 
 void ProbeDeviceAgent::SetConnect(int socket)
@@ -111,21 +125,4 @@ void ProbeDeviceAgent::SetConnect(int socket)
 
 }
 
-void ProbeDeviceAgent::sendToClient(Packet& outPacket)
-{
-	try
-	{
-		if (&outPacket)
-		{
 
-			//clientSocket.send(outPacket.GetData(),outPacket.GetSize(),MSG_DONTWAIT);
-		}
-	} catch (LibCException& e)
-	{
-		if (e.getCode() == EAGAIN)
-		{
-			//push back to queue,and send later
-		}
-	}
-
-}

@@ -24,20 +24,22 @@ Packet::~Packet()
 
 }
 
-string& Packet::PackMessage(string& strBody)
+string& Packet::PackMessage()
 {
 	MessageHead head;
-	strPacketBuffer.clear();
-	head.MsgID = m_ID;
-	head.SerialNo = m_nSerialNumber;
-	setHeadMobile(head);
-	head.MsgProperty.dummy = 0;
-	head.MsgProperty.value.length = strBody.size();
-	packHead(head);
-	strPacketBuffer.assign((const char*) &head, sizeof(head));
-	strPacketBuffer.append(strBody);
-	strPacketBuffer.append(1, checkSum(strPacketBuffer));
-	transformSnd(strPacketBuffer);
+	if (strPacketBuffer.empty())
+	{
+		head.MsgID = m_ID;
+		head.SerialNo = m_nSerialNumber;
+		setHeadMobile(head);
+		head.MsgProperty.dummy = 0;
+		head.MsgProperty.value.length = m_strBody.size();
+		packHead(head);
+		strPacketBuffer.assign((const char*) &head, sizeof(head));
+		strPacketBuffer.append(m_strBody);
+		strPacketBuffer.append(1, checkSum(strPacketBuffer));
+		transformSnd(strPacketBuffer);
+	}
 	return strPacketBuffer;
 }
 // extract the frame from streams, return true when frame is extracted

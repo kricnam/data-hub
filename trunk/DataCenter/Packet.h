@@ -39,7 +39,7 @@ public:
 	{
 		m_ID = id;
 		m_strMoblieNumber = szMobileNumber;
-		m_nSerialNumber = MessageSerialNumber++;
+		m_nSerialNumber = 0;
 		m_strBody = strBody;
 		m_bCheckSumError = false;
 	}
@@ -63,7 +63,7 @@ public:
 		strPacketBuffer.clear();
 	}
 	;
-	string& PackMessage(string& strBody);
+	string& PackMessage(void);
 	bool Parse(string& strRawData);
 
 	MESSAGE_ID GetMessageID(void)
@@ -86,6 +86,10 @@ public:
 		m_ID = id;
 	}
 	;
+	void SetSerialNumber(void)
+	{
+		m_nSerialNumber = MessageSerialNumber++;
+	};
 	void virtual Dump(void);
 protected:
 	MESSAGE_ID m_ID;
