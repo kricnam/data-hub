@@ -40,7 +40,8 @@ string& Packet::PackMessage(string& strBody)
 	transformSnd(strPacketBuffer);
 	return strPacketBuffer;
 }
-
+// extract the frame from streams, return true when frame is extracted
+// no matter what  the checksum or structure is correct
 bool Packet::Parse(string& strRawData)
 {
 	m_ID = MESSAGE_UNKNOWN;
@@ -65,11 +66,13 @@ bool Packet::Parse(string& strRawData)
 						strPacketBuffer.size() - 1 - sizeof(MessageHead));
 				TRACE(
 						"Head.Length=%d @ %d", Head.MsgProperty.value.length, m_strBody.size());
+				m_bCheckSumError = (Head.MsgProperty.value.length != m_strBody.size());
 				strPacketBuffer.clear();
-				return true;
 			}
 			else
 				m_bCheckSumError = true;
+
+			return true;
 		}
 	}
 	return false;
