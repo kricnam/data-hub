@@ -113,6 +113,17 @@ Protocol::RESULT Protocol::onAuthorize(Packet& inPacket)
 	return GeneralResponsePacket::SUCCESS;
 }
 
+string& Protocol::GetSendData(void)
+{
+	Packet& packet = outQueue.Front();
+	return packet.PackMessage();
+}
+
+void Protocol::OnSendResponseOK(void)
+{
+	outQueue.Pop();
+}
+
 bool Protocol::dispatch(Packet& inPacket)
 {
 	bool bResponsed = false;

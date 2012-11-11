@@ -27,6 +27,7 @@ void PacketQueue::Push(Packet& data)
 {
 	try
 	{
+		data.SetSerialNumber();
 		queue.push_back(data);
 	} catch (exception& ex)
 	{

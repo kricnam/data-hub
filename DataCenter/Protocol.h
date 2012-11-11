@@ -21,6 +21,9 @@ public:
 	virtual ~Protocol();
 
 	bool Response(Packet& inPacket);
+	string& GetSendData(void);
+	int SendQueueSize(void) { return outQueue.GetSize();};
+	void OnSendResponseOK(void);
 	bool m_bCloseConnect;
 protected:
 	typedef GeneralResponsePacket::GENERAL_RESULT_CODE RESULT;
