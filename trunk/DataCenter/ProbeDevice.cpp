@@ -36,6 +36,8 @@ ProbeDeviceAgent::~ProbeDeviceAgent()
 void ProbeDeviceAgent::OnReadClient(io& watcher, int revent)
 {
 	TRACE("%s:%u,[%d]", strIP.c_str(), nPort, revent);
+
+
 	do
 	{
 		char buffer[4096];
@@ -67,7 +69,8 @@ void ProbeDeviceAgent::OnReadClient(io& watcher, int revent)
 void ProbeDeviceAgent::OnTimeOut(timer& watcher, int revent)
 {
 	TRACE("timer");
-	//TimerWatch.again();
+	TimerWatch.stop();
+	IOWriteWatch.start();
 }
 
 void ProbeDeviceAgent::OnDisconnect(async& watcher, int revent)
@@ -84,8 +87,7 @@ void ProbeDeviceAgent::OnDisconnect(async& watcher, int revent)
 void ProbeDeviceAgent::OnWriteClient(io& watcher, int revent)
 {
 	TRACE("enter");
-	//if protocol get sent packet, then send, if ok ,pop it, if send queue empty stop watch
-	if (protocol.SendQueueSize())
+	if (protocol.SendQueueReady())
 	{
 		string& strData = protocol.GetSendData();
 		try
@@ -100,7 +102,16 @@ void ProbeDeviceAgent::OnWriteClient(io& watcher, int revent)
 		}
 	}
 	else
+	{
 		IOWriteWatch.stop();
+		time_t timeout = protocol.GetResponseTimeOut();
+		TRACE("set timeout %u",timeout);
+		if (timeout)
+		{
+			TimerWatch.repeat = timeout;
+			TimerWatch.again();
+		}
+	}
 }
 
 void ProbeDeviceAgent::SetConnect(int socket)
@@ -120,9 +131,8 @@ void ProbeDeviceAgent::SetConnect(int socket)
 	DisconnectSignal.start();
 
 	TimerWatch.set<ProbeDeviceAgent, &ProbeDeviceAgent::OnTimeOut>(this);
-	TimerWatch.repeat = 30;
+	TimerWatch.repeat = 5;
 	TimerWatch.start();
 
 }
-
 

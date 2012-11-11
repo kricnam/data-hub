@@ -17,6 +17,9 @@ Packet::Packet()
 	m_ID = MESSAGE_UNKNOWN;
 	m_nSerialNumber = 0;
 	m_bCheckSumError = false;
+	tSendTime = 0;
+	nTransmitCount = 0;
+	tTimeOut = 0;
 }
 
 Packet::~Packet()

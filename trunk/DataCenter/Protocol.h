@@ -22,14 +22,15 @@ public:
 
 	bool Response(Packet& inPacket);
 	string& GetSendData(void);
-	int SendQueueSize(void) { return outQueue.GetSize();};
+	int SendQueueReady(void) ;
 	void OnSendResponseOK(void);
+	time_t GetResponseTimeOut(void);
 	bool m_bCloseConnect;
 protected:
 	typedef GeneralResponsePacket::GENERAL_RESULT_CODE RESULT;
 	PacketQueue outQueue;
 	time_t tResponseTimeOut;
-	int nResponseTimeOutCount;
+	int nRetryLimit;
 	void setRegisterRecord(RegistPacket& pack,
 			DataStore::Vehicle_Record& record);
 	bool generalRespons(Packet& inPacket,

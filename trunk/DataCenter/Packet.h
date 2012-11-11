@@ -9,6 +9,7 @@
 #define PACKET_H_
 #include <string>
 #include <arpa/inet.h>
+#include <time.h>
 
 using namespace std;
 
@@ -42,6 +43,9 @@ public:
 		m_nSerialNumber = 0;
 		m_strBody = strBody;
 		m_bCheckSumError = false;
+		tSendTime = 0;
+		nTransmitCount = 0;
+		tTimeOut = 0;
 	}
 	;
 
@@ -90,6 +94,12 @@ public:
 	{
 		m_nSerialNumber = MessageSerialNumber++;
 	};
+
+	time_t GetSendTime(void) { return tSendTime;};
+	void SetSendTime(time_t n) { tSendTime = n;nTransmitCount++;};
+	int GetTransmitCount(void) { return nTransmitCount;};
+	void SetTimeOut(time_t t) { tTimeOut = t;};
+	time_t GetTimeOut(void) { return tTimeOut;};
 	void virtual Dump(void);
 protected:
 	MESSAGE_ID m_ID;
@@ -144,6 +154,9 @@ protected:
 	void bcd2string(string& str, BCD* bcd);
 
 	string strPacketBuffer;
+	time_t tSendTime;
+	time_t tTimeOut;
+	int nTransmitCount;
 
 };
 
