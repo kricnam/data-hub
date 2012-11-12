@@ -183,6 +183,9 @@ bool Protocol::dispatch(Packet& inPacket)
 		bAuthorized = true;
 		bResponsed = generalRespons(inPacket, onAuthorize(inPacket));
 		break;
+	case Packet::TERMINAL_GENERAL_HEARTBEAT:
+		bResponsed = generalRespons(inPacket,GeneralResponsePacket::SUCCESS);
+		break;
 	default:
 		bResponsed = generalRespons(inPacket,
 				GeneralResponsePacket::NO_SUPPORTED);
