@@ -92,6 +92,11 @@ public:
 		m_ID = id;
 	}
 	;
+
+	string& GetContent(void)
+	{
+		return m_strBody;
+	};
 	void SetSerialNumber(void)
 	{
 		m_nSerialNumber = MessageSerialNumber++;
@@ -156,7 +161,7 @@ protected:
 	void transformSnd(string& str);
 	bool verifyCheckSum();
 	void bcd2string(string& str, BCD* bcd);
-
+	void string2bcd(string& str, BCD* bcd);
 	string strPacketBuffer;
 	time_t tSendTime;
 	time_t tTimeOut;
