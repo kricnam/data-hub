@@ -150,12 +150,12 @@ void Packet::transformSnd(string& str)
 	{
 		if ((*it) == ID)
 		{
-			strTmp.append(1, ESC).append(1, 0x02);
+			strTmp.append(1, (char)ESC).append(1, (char)0x02);
 			continue;
 		}
 		if ((*it) == ESC)
 		{
-			strTmp.append(1, ESC).append(1, 0x01);
+			strTmp.append(1,(char)ESC).append(1, (char)0x01);
 			continue;
 		}
 		strTmp += (*it);
