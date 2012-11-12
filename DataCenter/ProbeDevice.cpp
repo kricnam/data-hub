@@ -44,6 +44,7 @@ void ProbeDeviceAgent::OnReadClient(io& watcher, int revent)
 		if (n > 0)
 		{
 			TRACE("read %d bytes", n);
+			DUMP(buffer,n);
 			Packet packet;
 			strCache.append(buffer, n);
 			if (packet.Parse(strCache))
