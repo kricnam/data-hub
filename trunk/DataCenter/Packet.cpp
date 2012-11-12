@@ -171,7 +171,10 @@ bool Packet::verifyCheckSum()
 
 void Packet::Dump(void)
 {
-	DEBUG("%u:size=%u", m_ID, m_nSerialNumber, m_strBody.size());
+    DEBUG(
+                    "%u:%u:%s:load size=%u", m_ID, m_nSerialNumber, m_strMoblieNumber.c_str(), m_strBody.size());
+    DEBUG("check %s", m_bCheckSumError?"FAIL":"OK");
+
 }
 
 void Packet::bcd2string(string& str, BCD* bcd)
