@@ -43,6 +43,8 @@ string& Packet::PackMessage()
 		strPacketBuffer.append(m_strBody);
 		strPacketBuffer.append(1, checkSum(strPacketBuffer));
 		transformSnd(strPacketBuffer);
+		strPacketBuffer.insert(0, 1, (char) SYNC);
+		strPacketBuffer.append(1, (char) SYNC);
 	}
 	return strPacketBuffer;
 }
@@ -71,8 +73,9 @@ bool Packet::Parse(string& strRawData)
 				m_strBody = strPacketBuffer.substr(sizeof(MessageHead) - 1,
 						strPacketBuffer.size() - 1 - sizeof(MessageHead));
 				TRACE(
-						"Head.Length=%d @ %d", Head.MsgProperty.value.length, m_strBody.size());
-				m_bCheckSumError = (Head.MsgProperty.value.length != m_strBody.size());
+						"Head.Length=%d/%d", Head.MsgProperty.value.length, m_strBody.size());
+				m_bCheckSumError = (Head.MsgProperty.value.length
+						!= m_strBody.size());
 				strPacketBuffer.clear();
 			}
 			else
@@ -88,19 +91,9 @@ bool Packet::Parse(string& strRawData)
 
 void Packet::setHeadMobile(MessageHead& head)
 {
-	string::reverse_iterator rit;
 	memset(head.MobileTelNo, 0, sizeof(head.MobileTelNo));
-	rit = m_strMoblieNumber.rbegin();
-	for (int i = sizeof(head.MobileTelNo); i > 0; i--)
-	{
-		if (rit == m_strMoblieNumber.rend())
-			break;
-		head.MobileTelNo[i - 1] = ((*rit) - 0x30);
-		rit--;
-		if (rit == m_strMoblieNumber.rend())
-			break;
-		head.MobileTelNo[i - 1] |= 0xF0 & (((*rit) - 0x30) << 4);
-	}
+
+	string2bcd(m_strMoblieNumber, head.MobileTelNo);
 }
 
 void Packet::packHead(MessageHead& head)
@@ -152,12 +145,12 @@ void Packet::transformSnd(string& str)
 	{
 		if ((*it) == SYNC)
 		{
-			strTmp.append(1, (char)ESC).append(1, (char)0x02);
+			strTmp.append(1, (char) ESC).append(1, (char) 0x02);
 			continue;
 		}
 		if ((*it) == ESC)
 		{
-			strTmp.append(1,(char)ESC).append(1, (char)0x01);
+			strTmp.append(1, (char) ESC).append(1, (char) 0x01);
 			continue;
 		}
 		strTmp += (*it);
@@ -173,9 +166,9 @@ bool Packet::verifyCheckSum()
 
 void Packet::Dump(void)
 {
-    DEBUG(
-                    "%u:%u:%s:load size=%u", m_ID, m_nSerialNumber, m_strMoblieNumber.c_str(), m_strBody.size());
-    DEBUG("check %s", m_bCheckSumError?"FAIL":"OK");
+	DEBUG(
+			"%u:%u:%s:load size=%u", m_ID, m_nSerialNumber, m_strMoblieNumber.c_str(), m_strBody.size());
+	DEBUG("check %s", m_bCheckSumError?"FAIL":"OK");
 
 }
 
@@ -185,5 +178,21 @@ void Packet::bcd2string(string& str, BCD* bcd)
 	{
 		str += ((bcd[i] & 0xF0) >> 4) + 0x30;
 		str += ((bcd[i] & 0x0F)) + 0x30;
+	}
+}
+
+void Packet::string2bcd(string& str, BCD* bcd)
+{
+	int j = 12 - str.size();
+	for (int i = 0; i < 6; i++)
+	{
+		char c = 0;
+		char d = 0;
+		if ((i * 2) >= j)
+		{
+			c = str[i * 2 - j];
+			d = str[i * 2 - j + 1];
+		}
+		bcd[i] = ((c & 0x0F) << 4) | (d & 0x0F);
 	}
 }
