@@ -51,10 +51,10 @@ string& Packet::PackMessage()
 bool Packet::Parse(string& strRawData)
 {
 	m_ID = MESSAGE_UNKNOWN;
-	string::size_type frameStart = strRawData.find(ID);
+	string::size_type frameStart = strRawData.find(SYNC);
 	if (frameStart != string::npos)
 	{
-		string::size_type frameEnd = strRawData.find(ID, frameStart + 1);
+		string::size_type frameEnd = strRawData.find(SYNC, frameStart + 1);
 		if (frameEnd != string::npos)
 		{
 			strPacketBuffer = strRawData.substr(frameStart + 1,
@@ -81,6 +81,8 @@ bool Packet::Parse(string& strRawData)
 			return true;
 		}
 	}
+	else
+		strRawData.clear(); //clear junk bytes
 	return false;
 }
 
@@ -132,7 +134,7 @@ void Packet::transformRcv(string& str)
 		if (str.at(pos + 1) == 0x01)
 			strTmp += ESC;
 		else if (str.at(pos + 1) == 0x02)
-			strTmp += ID;
+			strTmp += SYNC;
 		//else exception;
 		str.erase(0, pos + 2);
 		pos = str.find(ESC);
@@ -148,7 +150,7 @@ void Packet::transformSnd(string& str)
 	string strTmp;
 	for (it = str.begin(); it != str.end(); it++)
 	{
-		if ((*it) == ID)
+		if ((*it) == SYNC)
 		{
 			strTmp.append(1, (char)ESC).append(1, (char)0x02);
 			continue;

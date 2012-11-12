@@ -10,7 +10,7 @@
 
 RegistResponsePacket::RegistResponsePacket()
 {
-	m_ID = TERMINAL_REGIST_RESPONSE;
+	m_ID = PLATEFORM_RESPONSE_REGIST;
 	m_bResponse = true;
 }
 
@@ -18,7 +18,7 @@ RegistResponsePacket::RegistResponsePacket(int SerialNo,
 		const char* szMobileNumber, REGIST_RESULT_CODE result,
 		const char* szAuthSting)
 {
-	m_ID = TERMINAL_REGIST_RESPONSE;
+	m_ID = PLATEFORM_RESPONSE_REGIST;
 	m_strMoblieNumber = szMobileNumber;
 	response.SerialNo = htons(SerialNo);
 	response.Result = result;
