@@ -25,7 +25,7 @@ sig AccessServer::signal_watcher_term;
 
 AccessServer::AccessServer()
 {
-	nPort = 6666;
+	nPort = 9999;
 }
 
 AccessServer::~AccessServer()
