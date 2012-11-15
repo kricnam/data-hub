@@ -166,6 +166,7 @@ protected:
 	time_t tSendTime;
 	time_t tTimeOut;
 	int nTransmitCount;
+	MessageHead Head;
 
 };
 
