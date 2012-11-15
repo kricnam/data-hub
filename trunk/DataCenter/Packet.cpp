@@ -65,13 +65,14 @@ bool Packet::Parse(string& strRawData)
 			transformRcv(strPacketBuffer);
 			if (verifyCheckSum())
 			{
-				MessageHead Head = *((MessageHead*) strPacketBuffer.data());
+				Head = *((MessageHead*) strPacketBuffer.data());
 				m_ID = (MESSAGE_ID) ntohs(Head.MsgID);
 				Head.MsgProperty.dummy = ntohs(Head.MsgProperty.dummy);
 				m_nSerialNumber = ntohs(Head.SerialNo);
 				bcd2string(m_strMoblieNumber, Head.MobileTelNo);
-				m_strBody = strPacketBuffer.substr(sizeof(MessageHead) - 1,
-						strPacketBuffer.size() - 1 - sizeof(MessageHead));
+				//total size - header - checksum = content size
+				m_strBody = strPacketBuffer.substr(sizeof(MessageHead),
+						strPacketBuffer.size() - sizeof(MessageHead) - 1);
 				TRACE(
 						"Head.Length=%d/%d", Head.MsgProperty.value.length, m_strBody.size());
 				m_bCheckSumError = (Head.MsgProperty.value.length
@@ -106,11 +107,11 @@ void Packet::packHead(MessageHead& head)
 Packet::BYTE Packet::checkSum(string& str)
 {
 	string::iterator it;
-	BYTE sum = 0;
+	BYTE sum = 0x00;
 	for (it = str.begin(); it != str.end(); it++)
 	{
 		if (it == str.begin())
-			sum = (*it);
+			sum ^= (*it);
 		else
 			sum ^= (*it);
 	}
@@ -167,13 +168,14 @@ bool Packet::verifyCheckSum()
 void Packet::Dump(void)
 {
 	DEBUG(
-			"%u:%u:%s:load size=%u", m_ID, m_nSerialNumber, m_strMoblieNumber.c_str(), m_strBody.size());
-	DEBUG("check %s", m_bCheckSumError?"FAIL":"OK");
+			"\nID:\t0x%X\nProp:\t[0x%04X]\n\tPack=%u;Enc=%u;length=%u\nMobil:\t%s\nSN:\t0x%X", m_ID, Head.MsgProperty.dummy, Head.MsgProperty.value.fragment, Head.MsgProperty.value.encrypt, Head.MsgProperty.value.length, m_strMoblieNumber.c_str(), m_nSerialNumber);
+	DEBUG("check sum:%s", m_bCheckSumError?"FAIL":"OK");
 
 }
 
 void Packet::bcd2string(string& str, BCD* bcd)
 {
+	str.clear();
 	for (int i = 0; i < 6; i++)
 	{
 		str += ((bcd[i] & 0xF0) >> 4) + 0x30;
@@ -191,6 +193,9 @@ void Packet::string2bcd(string& str, BCD* bcd)
 		if ((i * 2) >= j)
 		{
 			c = str[i * 2 - j];
+		}
+		if ((i * 2 + 1) >= j)
+		{
 			d = str[i * 2 - j + 1];
 		}
 		bcd[i] = ((c & 0x0F) << 4) | (d & 0x0F);
