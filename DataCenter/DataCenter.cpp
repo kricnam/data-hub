@@ -9,8 +9,6 @@
 #include <stdlib.h>
 #include "AccessServer.h"
 #include "TraceLog.h"
-#include "DeviceTable.h"
-#include "ProbeDevice.h"
 
 int main(void)
 {

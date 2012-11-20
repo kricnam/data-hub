@@ -14,7 +14,7 @@
 #include "cppsocket/tcpserver.h"
 #include "DeviceTable.h"
 #include "ProcessAgent.h"
-#include "ProbeDevice.h"
+#include "DeviceAgent.h"
 #include <ev++.h>
 #include "DeviceTable.h"
 #include <set>
@@ -26,7 +26,7 @@ using namespace ev;
 
 #define MAX_EVENTS 10000
 class DeviceTable;
-class ProbeDeviceAgent;
+class DeviceAgent;
 class AccessServer:public virtual  ProcessAgent
 {
 public:
@@ -36,7 +36,7 @@ public:
 	void Run(void);
 	void Stop();
 	void Process(unsigned int event);
-	void OnDisconnect(ProbeDeviceAgent& agent);
+	void OnDisconnect(DeviceAgent& agent);
 	static void SetSignalHander(void);
 	static void SignalHandle(sig& water, int revent);
 	static bool bStop;

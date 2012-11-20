@@ -19,11 +19,11 @@ using namespace ev;
 using namespace CPPSocket;
 
 class AccessServer;
-class ProbeDeviceAgent
+class DeviceAgent
 {
 public:
-	ProbeDeviceAgent();
-	virtual ~ProbeDeviceAgent();
+	DeviceAgent();
+	virtual ~DeviceAgent();
 	virtual void Process(int revent) {};
 	void OnReadClient(io& watcher,int revent);
 	void OnWriteClient(io& watcher,int revent);

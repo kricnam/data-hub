@@ -6,7 +6,6 @@
  */
 
 #include "DeviceTable.h"
-#include "ProbeDevice.h"
 #include "TraceLog.h"
 using namespace std;
 
@@ -21,7 +20,7 @@ DeviceTable::~DeviceTable()
 	// TODO delete all allocated memory
 }
 
-ProbeDeviceAgent& DeviceTable::AllocAgent(void)
+DeviceAgent& DeviceTable::AllocAgent(void)
 {
 	if (freeDevice.empty())
 	{
@@ -32,13 +31,13 @@ ProbeDeviceAgent& DeviceTable::AllocAgent(void)
 			devicePool.reserve(10 + devicePool.capacity());
 		}
 		DEBUG("alloc new memory");
-		ProbeDeviceAgent* agent = new ProbeDeviceAgent;
+		DeviceAgent* agent = new DeviceAgent;
 		refDevice ref;
 		ref = agent;
 		devicePool.push_back(ref);
 		freeDevice.push_back(ref);
 	}
-	ProbeDeviceAgent& agent = *(freeDevice.front());
+	DeviceAgent& agent = *(freeDevice.front());
 	freeDevice.pop_front();
 	workingDevice.insert(&agent);
 	DEBUG("pool %d,free %d,used %d",devicePool.size(),freeDevice.size(),workingDevice.size());
@@ -46,7 +45,7 @@ ProbeDeviceAgent& DeviceTable::AllocAgent(void)
 }
 
 
-ProbeDeviceAgent& DeviceTable::ReleaseDevice(ProbeDeviceAgent& device)
+DeviceAgent& DeviceTable::ReleaseDevice(DeviceAgent& device)
 {
 	set<refDevice>::iterator it = workingDevice.find(&device);
 
