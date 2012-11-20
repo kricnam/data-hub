@@ -5,7 +5,7 @@
  *      Author: mxx
  */
 
-#include "ProbeDevice.h"
+#include "DeviceAgent.h"
 #include "cppsocket/tcpconnection.h"
 #include <ev++.h>
 #include <string>
@@ -18,13 +18,13 @@ using namespace ev;
 using namespace CPPSocket;
 using namespace std;
 
-ProbeDeviceAgent::ProbeDeviceAgent()
+DeviceAgent::DeviceAgent()
 {
 	nPort = 0;
 	ptrSrv = NULL;
 }
 
-ProbeDeviceAgent::~ProbeDeviceAgent()
+DeviceAgent::~DeviceAgent()
 {
 	IOReadWatch.stop();
 	DisconnectSignal.stop();
@@ -33,7 +33,7 @@ ProbeDeviceAgent::~ProbeDeviceAgent()
 	TRACE("agent vanished");
 }
 
-void ProbeDeviceAgent::OnReadClient(io& watcher, int revent)
+void DeviceAgent::OnReadClient(io& watcher, int revent)
 {
 	TRACE("%s:%u,[%d]", strIP.c_str(), nPort, revent);
 
@@ -66,14 +66,14 @@ void ProbeDeviceAgent::OnReadClient(io& watcher, int revent)
 	DisconnectSignal.send();
 }
 
-void ProbeDeviceAgent::OnTimeOut(timer& watcher, int revent)
+void DeviceAgent::OnTimeOut(timer& watcher, int revent)
 {
 	TRACE("timer");
 	TimerWatch.stop();
 	IOWriteWatch.start();
 }
 
-void ProbeDeviceAgent::OnDisconnect(async& watcher, int revent)
+void DeviceAgent::OnDisconnect(async& watcher, int revent)
 {
 	IOReadWatch.stop();
 	DisconnectSignal.stop();
@@ -84,7 +84,7 @@ void ProbeDeviceAgent::OnDisconnect(async& watcher, int revent)
 	TRACE("client removed");
 }
 
-void ProbeDeviceAgent::OnWriteClient(io& watcher, int revent)
+void DeviceAgent::OnWriteClient(io& watcher, int revent)
 {
 	TRACE("enter");
 	if (protocol.SendQueueReady())
@@ -115,23 +115,23 @@ void ProbeDeviceAgent::OnWriteClient(io& watcher, int revent)
 	}
 }
 
-void ProbeDeviceAgent::SetConnect(int socket)
+void DeviceAgent::SetConnect(int socket)
 {
 	clientSocket.attach(socket);
 
-	IOReadWatch.set<ProbeDeviceAgent, &ProbeDeviceAgent::OnReadClient>(this);
+	IOReadWatch.set<DeviceAgent, &DeviceAgent::OnReadClient>(this);
 	IOReadWatch.set(socket, ev::READ);
 	IOReadWatch.start();
 
-	IOWriteWatch.set<ProbeDeviceAgent, &ProbeDeviceAgent::OnWriteClient>(this);
+	IOWriteWatch.set<DeviceAgent, &DeviceAgent::OnWriteClient>(this);
 	IOWriteWatch.set(socket, ev::WRITE);
 	IOWriteWatch.start();
 
-	DisconnectSignal.set<ProbeDeviceAgent, &ProbeDeviceAgent::OnDisconnect>(
+	DisconnectSignal.set<DeviceAgent, &DeviceAgent::OnDisconnect>(
 			this);
 	DisconnectSignal.start();
 
-	TimerWatch.set<ProbeDeviceAgent, &ProbeDeviceAgent::OnTimeOut>(this);
+	TimerWatch.set<DeviceAgent, &DeviceAgent::OnTimeOut>(this);
 	TimerWatch.repeat = 5;
 	TimerWatch.start();
 

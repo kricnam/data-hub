@@ -7,27 +7,27 @@
 
 #ifndef DEVICETABLE_H_
 #define DEVICETABLE_H_
-#include "ProbeDevice.h"
+#include "DeviceAgent.h"
 #include <string>
 #include <list>
 #include <set>
 #include <vector>
 
 using namespace std;
-class ProbeDeviceAgent;
+class DeviceAgent;
 
 class DeviceTable
 {
 public:
 	DeviceTable();
 	virtual ~DeviceTable();
-	ProbeDeviceAgent& AllocAgent(void);
-	ProbeDeviceAgent& SetWorkingOn(const char* szID,ProbeDeviceAgent& device);
-	ProbeDeviceAgent& ReleaseDevice(ProbeDeviceAgent& devic);
+	DeviceAgent& AllocAgent(void);
+	DeviceAgent& SetWorkingOn(const char* szID,DeviceAgent& device);
+	DeviceAgent& ReleaseDevice(DeviceAgent& devic);
 	void ReleaseAll(void);
 
 protected:
-	typedef ProbeDeviceAgent* refDevice;
+	typedef DeviceAgent* refDevice;
 
 	vector<refDevice>  devicePool;
 	list<refDevice> freeDevice;

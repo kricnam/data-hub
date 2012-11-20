@@ -13,7 +13,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cppsocket/socket.h"
-#include "ProbeDevice.h"
 
 using namespace std;
 using namespace ev;
@@ -86,7 +85,7 @@ void AccessServer::Stop()
 	server.stop();
 }
 
-void AccessServer::OnDisconnect(ProbeDeviceAgent& agent)
+void AccessServer::OnDisconnect(DeviceAgent& agent)
 {
 	clients.ReleaseDevice(agent);
 }
@@ -96,7 +95,7 @@ void AccessServer::onIncomeConnect(io& watcher, int revent)
 	Address address;
 	int clientSocket;
 	clientSocket = server.acceptSocket(address);
-	ProbeDeviceAgent& agent = clients.AllocAgent();
+	DeviceAgent& agent = clients.AllocAgent();
 	agent.SetConnect(clientSocket);
 	agent.SetClientAddress(address.getIPString().c_str(), address.getPort());
 	agent.SetServer(this);
