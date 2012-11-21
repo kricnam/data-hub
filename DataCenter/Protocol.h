@@ -21,15 +21,19 @@ public:
 	virtual ~Protocol();
 
 	bool Response(Packet& inPacket);
+	int Timer(void);
 	string& GetSendData(void);
 	int SendQueueReady(void) ;
 	void OnSendResponseOK(void);
 	time_t GetResponseTimeOut(void);
+	bool IsAuthorized(void) {return bAuthorized;};
 	bool m_bCloseConnect;//Indicate protocol demand close
+
 protected:
 	typedef GeneralResponsePacket::GENERAL_RESULT_CODE RESULT;
 	PacketQueue outQueue;
 	time_t tResponseTimeOut;
+	time_t tConnectTime;
 	int nRetryLimit;
 	void setRegisterRecord(RegistPacket& pack,
 			DataStore::Vehicle_Record& record);
