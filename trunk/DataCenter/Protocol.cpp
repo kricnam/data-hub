@@ -21,6 +21,7 @@ Protocol::Protocol()
 	bAuthorized = false;
 	m_bCloseConnect = false;
 	nRetryLimit = 3;
+	tConnectTime = 0;
 }
 
 Protocol::~Protocol()
@@ -167,6 +168,22 @@ time_t Protocol::GetResponseTimeOut(void)
 	return outQueue.Front().GetTimeOut();
 }
 
+int Protocol::Timer(void)
+{
+	if (tConnectTime==0)
+	{
+		tConnectTime = time(NULL);
+		return 30;
+	}
+
+	if (time(NULL)-tConnectTime >= 30 && !bAuthorized)
+	{
+		m_bCloseConnect = true;
+	}
+
+	return GetResponseTimeOut();
+}
+
 bool Protocol::dispatch(Packet& inPacket)
 {
 	bool bResponsed = false;
@@ -177,9 +194,11 @@ bool Protocol::dispatch(Packet& inPacket)
 		bResponsed = onRegist(inPacket);
 		break;
 	case Packet::MESSAGE_UNKNOWN:
+		TRACE("unknown message");
 		m_bCloseConnect = true;
 		break;
 	case Packet::TERMINAL_AUTHORIZE:
+		//FIXME:set according to onAuthorize result;
 		bAuthorized = true;
 		bResponsed = generalRespons(inPacket, onAuthorize(inPacket));
 		break;

@@ -111,7 +111,12 @@ void DeviceAgent::OnWriteClient(io& watcher, int revent)
 	else
 	{
 		IOWriteWatch.stop();
-		time_t timeout = protocol.GetResponseTimeOut();
+		time_t timeout = protocol.Timer();
+		if (protocol.m_bCloseConnect)
+		{
+			DisconnectSignal.send();
+			return;
+		}
 		TRACE("set timeout %u", timeout);
 		if (timeout)
 		{
