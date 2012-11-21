@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include "AccessServer.h"
 #include "TraceLog.h"
-
+#include <unistd.h>
 int main(void)
 {
 	SETTRACELEVEL(0);
