@@ -20,6 +20,7 @@ public:
 	Protocol();
 	virtual ~Protocol();
 
+	void Reset(void);
 	bool Response(Packet& inPacket);
 	int Timer(void);
 	string& GetSendData(void);

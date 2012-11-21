@@ -130,6 +130,8 @@ void DeviceAgent::SetConnect(int socket)
 {
 	clientSocket.attach(socket);
 
+	protocol.Reset();
+
 	IOReadWatch.set<DeviceAgent, &DeviceAgent::OnReadClient>(this);
 	IOReadWatch.set(socket, ev::READ);
 	IOReadWatch.start();

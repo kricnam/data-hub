@@ -17,11 +17,7 @@ using namespace std;
 
 Protocol::Protocol()
 {
-	tResponseTimeOut = 10;
-	bAuthorized = false;
-	m_bCloseConnect = false;
-	nRetryLimit = 3;
-	tConnectTime = 0;
+	Reset();
 }
 
 Protocol::~Protocol()
@@ -182,6 +178,15 @@ int Protocol::Timer(void)
 	}
 
 	return GetResponseTimeOut();
+}
+
+void Protocol::Reset(void)
+{
+	tResponseTimeOut = 10;
+	bAuthorized = false;
+	m_bCloseConnect = false;
+	nRetryLimit = 3;
+	tConnectTime = 0;
 }
 
 bool Protocol::dispatch(Packet& inPacket)
