@@ -37,32 +37,38 @@ void DeviceAgent::OnReadClient(io& watcher, int revent)
 {
 	TRACE("%s:%u,[%d]", strIP.c_str(), nPort, revent);
 
-	do
+	char buffer[4096];
+	int n = 0;
+	try
 	{
-		char buffer[4096];
-		int n = clientSocket.recv(buffer, 4096, 0);
-		if (n > 0)
+		n = clientSocket.recv(buffer, 4096, 0);
+	} catch (Exception& e)
+	{
+		DEBUG(e.what());
+	}
+
+	if (n > 0)
+	{
+		TRACE("read %d bytes", n);
+		DUMP(buffer, n);
+		Packet packet;
+		strCache.append(buffer, n);
+		while (packet.Parse(strCache))
 		{
-			TRACE("read %d bytes", n);
-			DUMP(buffer,n);
-			Packet packet;
-			strCache.append(buffer, n);
-			if (packet.Parse(strCache))
+			if (protocol.Response(packet))
 			{
-				if (protocol.Response(packet))
-				{
-					if (!IOWriteWatch.is_active())
-						IOWriteWatch.start();
-				}
-				else
-				{
-					if (protocol.m_bCloseConnect)
-						break;
-				}
+				if (!IOWriteWatch.is_active())
+					IOWriteWatch.start();
 			}
-			return;
-		}
-	} while (false);
+			else
+			{
+				if (protocol.m_bCloseConnect)
+					break;
+			}
+		};
+		return;
+	}
+
 	DisconnectSignal.send();
 }
 
@@ -127,8 +133,7 @@ void DeviceAgent::SetConnect(int socket)
 	IOWriteWatch.set(socket, ev::WRITE);
 	IOWriteWatch.start();
 
-	DisconnectSignal.set<DeviceAgent, &DeviceAgent::OnDisconnect>(
-			this);
+	DisconnectSignal.set<DeviceAgent, &DeviceAgent::OnDisconnect>(this);
 	DisconnectSignal.start();
 
 	TimerWatch.set<DeviceAgent, &DeviceAgent::OnTimeOut>(this);
