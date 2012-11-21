@@ -50,6 +50,8 @@ string& Packet::PackMessage()
 }
 // extract the frame from streams, return true when frame is extracted
 // no matter what  the checksum or structure is correct
+// return true when found a data frame else return false
+// if checksum error, set check sum error flag
 bool Packet::Parse(string& strRawData)
 {
 	m_ID = MESSAGE_UNKNOWN;
@@ -62,9 +64,12 @@ bool Packet::Parse(string& strRawData)
 			strPacketBuffer = strRawData.substr(frameStart + 1,
 					frameEnd - frameStart - 1);
 			strRawData.erase(frameStart, frameEnd - frameStart + 1);
+
 			transformRcv(strPacketBuffer);
+
 			if (verifyCheckSum())
 			{
+				TRACE("check sum verify ok");
 				Head = *((MessageHead*) strPacketBuffer.data());
 				m_ID = (MESSAGE_ID) ntohs(Head.MsgID);
 				Head.MsgProperty.dummy = ntohs(Head.MsgProperty.dummy);
@@ -75,12 +80,14 @@ bool Packet::Parse(string& strRawData)
 						strPacketBuffer.size() - sizeof(MessageHead) - 1);
 				TRACE(
 						"Head.Length=%d/%d", Head.MsgProperty.value.length, m_strBody.size());
-				m_bCheckSumError = (Head.MsgProperty.value.length
-						!= m_strBody.size());
+
 				strPacketBuffer.clear();
 			}
 			else
+			{
+				TRACE("checksum fail");
 				m_bCheckSumError = true;
+			}
 
 			return true;
 		}
@@ -130,9 +137,13 @@ void Packet::transformRcv(string& str)
 		else if (str.at(pos + 1) == 0x02)
 			strTmp += SYNC;
 		//else exception;
-		str.erase(0, pos + 2);
+		if ((pos + 2) <= str.size())
+			str.erase(0, pos + 2);
+		else
+			break;
 		pos = str.find(ESC);
 	};
+	if (str.size()) strTmp += str;
 	if (strTmp.size())
 		str = strTmp;
 	return;
