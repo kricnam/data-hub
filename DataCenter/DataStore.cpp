@@ -35,5 +35,6 @@ bool DataStore::FindTerminalRecord(const char* TerminalID)
 
 bool DataStore::GetVechicleRecord(Vehicle_Record& record)
 {
+	record.strAuthCode = "1234567890";
 	return true;
 }
